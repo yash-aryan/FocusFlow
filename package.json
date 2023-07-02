@@ -1,0 +1,27 @@
+{
+  "name": "focusflow",
+  "version": "1.0.0",
+  "description": "FocusFlow is a simple To-Do List webapp project that I created using vanilla Javascript when doing The Odin Project Course.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack",
+    "live-pusher": "git subtree push --prefix dist origin gh-pages"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yash-aryan/FocusFlow.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yash-aryan/FocusFlow/issues"
+  },
+  "homepage": "https://github.com/yash-aryan/FocusFlow#readme",
+  "devDependencies": {
+    "css-loader": "^6.8.1",
+    "style-loader": "^3.3.3",
+    "webpack": "^5.88.1",
+    "webpack-cli": "^5.1.4"
+  }
+}
