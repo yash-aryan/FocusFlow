@@ -30,8 +30,7 @@ export const taskFactory = (
 				project = value;
 				break;
 			default:
-				console.log("invalid case in editTask()");
-				break;
+				return console.log("invalid case in editTask()");
 		}
 	}
 
