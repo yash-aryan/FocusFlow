@@ -26,6 +26,8 @@ const task = (() => {
 		if (index === null) return console.log("Enter an index first!");
 
 		_todoList[index].editTask(type, value);
+		
+		// Also modifies from the storage
 		const _updatedTask = _todoList[index].getInfo();
 		storage("modify", index, _updatedTask);
 	}
@@ -56,3 +58,5 @@ if (localStorage.length !== 0) {
 /* Exposing task IIFE globally for CONSOLE test version of todolist due to
 webpack bundling and preventing access to global variables */
 window.task = task;
+
+document.querySelector("#addTaskDialog").showModal();
