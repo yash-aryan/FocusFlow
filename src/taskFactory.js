@@ -1,16 +1,39 @@
 "use strict";
 
-import { format } from "date-fns";
+import { format, isToday, parseISO } from "date-fns";
 
-export const taskFactory = (title, rawDate, desc, priority, project) => {
-	let duedate,
-		_isCompleted = false;
+// Module that deals with creating task objects
+export function taskFactory(
+	title,
+	inputDuedate,
+	desc,
+	priority,
+	project
+) {
+	let _isCompleted = false,
+		_formattedDuedate;
 
-	// Whether TO FORMAT the input date OR NOT, based on if it's already formatted (e.g. when taken directly from the storage).
-	duedate = rawDate.indexOf(" ") === -1 ? _formatDate(rawDate) : rawDate;
+	// Formats date if it's not already.
+	_formattedDuedate =
+		inputDuedate.indexOf(" ") === -1 ? _formatDate(inputDuedate) : inputDuedate;
+
+	// Date-fns function to format ISO date to something like "12th Jun 2023, 11:20 PM" or "Today, 11:20 PM".
+	function _formatDate() {
+		const _parsedDate = parseISO(inputDuedate);
+		if (isToday(_parsedDate)) return `Today, ${format(_parsedDate, "p")}`;
+		else return format(_parsedDate, "do MMM y, p");
+	}
 
 	function getInfo() {
-		return { title, duedate, completed: _isCompleted, desc, priority, project };
+		return {
+			title,
+			duedate: _formattedDuedate,
+			desc,
+			priority,
+			project,
+			completed: _isCompleted,
+			duedateISO: inputDuedate,
+		};
 	}
 
 	function editTask(type, value) {
@@ -19,7 +42,8 @@ export const taskFactory = (title, rawDate, desc, priority, project) => {
 				title = value;
 				break;
 			case "duedate":
-				duedate = _formatDate(value);
+				inputDuedate = value;
+				_formattedDuedate = _formatDate(value);
 				break;
 			case "desc":
 				desc = value;
@@ -39,13 +63,9 @@ export const taskFactory = (title, rawDate, desc, priority, project) => {
 		_isCompleted = _isCompleted ? false : true;
 	}
 
-	function _formatDate(inputDate) {
-		return format(new Date(inputDate), "Pp");
-	}
-
 	return {
 		getInfo,
 		editTask,
 		toggleTaskStatus,
 	};
-};
+}

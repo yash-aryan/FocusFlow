@@ -1,62 +1,61 @@
 "use strict";
 import "./style.css";
 import { taskFactory } from "./taskFactory";
-import { storage } from "./storageMethods";
+import { storage } from "./storageHandler";
 
-const task = (() => {
+const todolist = (() => {
 	let _todoList = [];
 
 	function create(...args) {
 		const _newTask = taskFactory(...args);
 		_todoList.push(_newTask);
 		const _index = _todoList.indexOf(_newTask);
-		storage("save", _index, _newTask);
+		storage.save(_index, _newTask);
 	}
 
 	function insert(restoredTask) {
 		_todoList.push(restoredTask);
 	}
 
-	function get(index = null) {
-		if (index === null) console.dir(_todoList);
-		else return _todoList[index];
+	function getTask(index = null) {
+		return _todoList[index];
 	}
 
 	function edit(index = null, type, value) {
-		if (index === null) return console.log("Enter an index first!");
-
 		_todoList[index].editTask(type, value);
-		
 		// Also modifies from the storage
 		const _updatedTask = _todoList[index].getInfo();
-		storage("modify", index, _updatedTask);
+		storage.modify(index, _updatedTask);
 	}
 
-	function remove(index) {
+	function removeAt(index) {
 		_todoList.splice(index, 1);
-		storage("remove", index);
+		storage.removeAt(index);
+	}
+
+	function getByProject(name = "") {
+		if (name === "") return [..._todoList];
+		return _todoList.filter(n => n.getInfo().project === name);
 	}
 
 	return {
 		create,
 		insert,
-		get,
+		getTask,
 		edit,
-		remove,
+		removeAt,
+		getByProject,
 	};
 })();
 
 // Checks browser's localStorage for data on every reload/refresh.
 // If data is present, then each of them are added back to the todolist.
-if (localStorage.length !== 0) {
-	for (let index = 0; index < localStorage.length; index++) {
-		const restoredTask = storage("get", index);
-		task.insert(restoredTask);
+if (storage.size() !== 0) {
+	for (let i = 0; i < localStorage.length; i++) {
+		const restoredTask = taskFactory(...Object.values(storage.getFrom(i)));
+		todolist.insert(restoredTask);
 	}
 }
 
-/* Exposing task IIFE globally for CONSOLE test version of todolist due to
-webpack bundling and preventing access to global variables */
-window.task = task;
-
-document.querySelector("#addTaskDialog").showModal();
+console.log(todolist.getByProject());
+window.todolist = todolist;

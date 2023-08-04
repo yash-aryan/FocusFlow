@@ -8,8 +8,8 @@ FocusFlow is a simple To-Do List web-app project that I created using vanilla Ja
 - GUI version soon!
 
 # Additional Details
-- A global `task` object is exposed on purpose to allow me test all task related methods & the core logic.
-- Tasks can be created using `task.create(args)` with `args` being all properties of task as a string.
-  - for example: `task.create("Attend the Event", "2023-08-01T05:10")`
+- A Named IIFE `todolist` is exposed globally which returns an object with bunch of useful functions, allowing me to test the core logic.
+- Tasks can be created using `todolist.create(args)` with `args` being all properties of task as a string.
+  - for example: `todolist.create("Attend the Event", "2023-08-01T05:10")`
 - The duedate passed as an argument is formatted just how as the value stored by the `<input type="datetime-local">`
-- A localStorage is also used to allow todolist to be persistant on every browser session (until removed using `task.remove()`).
+- After every browser re-open/refresh, tasks objects are automatically added back to the todolist from the localStorage.
