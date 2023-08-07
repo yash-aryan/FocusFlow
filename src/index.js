@@ -1,61 +1,57 @@
 "use strict";
 import "./style.css";
-import { taskFactory } from "./taskFactory";
-import { storage } from "./storageHandler";
+import todolist from "./todolistHandler";
+import dom from "./domHandler";
+import storage from "./storageHandler";
 
-const todolist = (() => {
-	let _todoList = [];
-
-	function create(...args) {
-		const _newTask = taskFactory(...args);
-		_todoList.push(_newTask);
-		const _index = _todoList.indexOf(_newTask);
-		storage.save(_index, _newTask);
-	}
-
-	function insert(restoredTask) {
-		_todoList.push(restoredTask);
-	}
-
-	function getTask(index = null) {
-		return _todoList[index];
-	}
-
-	function edit(index = null, type, value) {
-		_todoList[index].editTask(type, value);
-		// Also modifies from the storage
-		const _updatedTask = _todoList[index].getInfo();
-		storage.modify(index, _updatedTask);
-	}
-
-	function removeAt(index) {
-		_todoList.splice(index, 1);
-		storage.removeAt(index);
-	}
-
-	function getByProject(name = "") {
-		if (name === "") return [..._todoList];
-		return _todoList.filter(n => n.getInfo().project === name);
-	}
-
-	return {
-		create,
-		insert,
-		getTask,
-		edit,
-		removeAt,
-		getByProject,
-	};
-})();
-
-// Checks browser's localStorage for data on every reload/refresh.
-// If data is present, then each of them are added back to the todolist.
+window.todolist = todolist;
+// Restore tasks objects back to todolist after every reload/refresh.
 if (storage.size() !== 0) {
-	for (let i = 0; i < localStorage.length; i++) {
-		const restoredTask = taskFactory(...Object.values(storage.getFrom(i)));
-		todolist.insert(restoredTask);
+	for (let index = 0; index < storage.size(); index++) {
+		const taskObj = todolist.restoreTask(index);
+		dom.taskDiv.create(index, taskObj.getInfo());
 	}
 }
 
-console.log(todolist.getByProject());
-window.todolist = todolist;
+document
+	.querySelector("#tasks-container")
+	.addEventListener("click", taskEventHandler);
+document.querySelector("#btn-cta").addEventListener("click", startFlowAddTask);
+
+function taskEventHandler(e) {
+	const node = e.target;
+	if (node.closest(".task") === null) return;
+	if (node.closest("button.task__check-btn")) dom.taskDiv.toggleState(node);
+}
+
+function startFlowAddTask() {
+	dom.formModal.open();
+	document.querySelector("#form").addEventListener("submit", addTask);
+
+	function addTask(e) {
+		e.preventDefault();
+		const formInputs = getFormInput();
+		const taskIndex = todolist.create(formInputs);
+		const taskObj = todolist.getTask(taskIndex);
+		dom.taskDiv.create(taskIndex, taskObj.getInfo());
+		dom.formModal.close();
+	}
+}
+
+function getFormInput() {
+	const title = document.querySelector("#input-title").value;
+	const duedate = document.querySelector("#input-duedate").value;
+	const desc = document.querySelector("#input-desc").value;
+	const priority = document.querySelector(
+		'input[name="priority"]:checked'
+	).value;
+	const project = document.querySelector("#input-project").value;
+
+	return {
+		title,
+		duedate,
+		desc,
+		priority,
+		project,
+	};
+}

@@ -1,7 +1,7 @@
 "use strict";
 
 // Module that deals with how tasks are stored after closing the browser. Uses localStorage.
-export const storage = (() => {
+const storage = (() => {
 	function size() {
 		return localStorage.length;
 	}
@@ -31,3 +31,5 @@ export const storage = (() => {
 		removeAt,
 	};
 })();
+
+export default storage;
