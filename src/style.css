@@ -9,7 +9,7 @@
 */
 
 :root {
-	--primary-color: #777;
+	--primary-color: #ddd;
 }
 
 *,
@@ -18,12 +18,16 @@
 	box-sizing: border-box;
 }
 
+body {
+	margin: 0;
+}
+
 #root-container {
 	display: grid;
-	grid-template-rows: 1fr 4fr;
-	grid-template-columns: 1fr 3fr;
+	grid-template-rows: auto 1fr;
+	grid-template-columns: 1fr 4fr;
 	grid-auto-flow: row;
-	gap: 2rem;
+	gap: 2rem 6rem;
 }
 
 /* ---HEADER--- */
@@ -32,6 +36,7 @@ header {
 	grid-area: 1 / 1 / 2 / -1;
 	display: grid;
 	place-items: center;
+	margin-top: 1rem;
 }
 
 header #header--topmost {
@@ -42,17 +47,7 @@ header #header--topmost {
 
 #sidebar {
 	grid-area: 2 / 1 / -1 / 2;
-	margin-left: 4rem;
-}
-
-/* ---MAIN--- */
-
-#main-wrapper {
-	grid-area: 2 / 2 / 3 / 3;
-	margin-right: 4rem;
-	display: flex;
-	flex-direction: column;
-	gap: 2rem;
+	/* margin-left: 4rem; */
 }
 
 #sidebar__items-list,
@@ -65,9 +60,29 @@ header #header--topmost {
 	gap: 2rem;
 }
 
+.sidebar__item {
+	display: flex;
+	justify-content: flex-end;
+	padding: 0.5rem;
+	cursor: pointer;
+}
+.sidebar__item:hover {
+	background-color: var(--primary-color);
+}
+
 .sidebar__item > span {
 	font-size: 1.5rem;
 	font-weight: 700;
+}
+
+/* ---MAIN--- */
+
+#main-wrapper {
+	grid-area: 2 / 2 / 3 / 3;
+	display: flex;
+	flex-direction: column;
+	gap: 2rem;
+	margin-right: 6rem;
 }
 
 /* modal w/ form component */
@@ -93,6 +108,7 @@ header #header--topmost {
 #btn-cta {
 	align-self: flex-start;
 	padding: 1rem;
+	cursor: pointer;
 }
 
 #tasks-container {

@@ -9,19 +9,45 @@ window.todolist = todolist;
 if (storage.size() !== 0) {
 	for (let index = 0; index < storage.size(); index++) {
 		const taskObj = todolist.restoreTask(index);
-		dom.taskDiv.create(index, taskObj.getInfo());
+		dom.taskContainer.createTask(index, taskObj.getInfo());
+		dom.sidebar.createItem("restore", taskObj.getInfo().project);
 	}
 }
 
 document
 	.querySelector("#tasks-container")
 	.addEventListener("click", taskEventHandler);
+document
+	.querySelector("#sidebar__items-list")
+	.addEventListener("click", sidebarEventHandler);
 document.querySelector("#btn-cta").addEventListener("click", startFlowAddTask);
 
 function taskEventHandler(e) {
 	const node = e.target;
 	if (node.closest(".task") === null) return;
-	if (node.closest("button.task__check-btn")) dom.taskDiv.toggleState(node);
+	if (node.closest("button.task__check-btn")) {
+		const taskNode = node.closest("div.task");
+		const taskObj = todolist.getTask(taskNode.dataset.index);
+		taskObj.toggleTaskStatus();
+		dom.taskContainer.toggleTaskState(taskNode);
+	}
+}
+
+function sidebarEventHandler(e) {
+	const node = e.target;
+	if (node.closest(".sidebar__item") && node.closest("#projects-container")) {
+		const childNode = node.closest(".sidebar__item").querySelector("span");
+		dom.taskContainer.removeAllTasks();
+		todolist.getByProject(childNode.innerText).forEach(taskObj => {
+			const index = todolist.getByProject().indexOf(taskObj);
+			dom.taskContainer.createTask(index, taskObj.getInfo());
+		});
+	} else if (node.closest("#sidebar__home-item")) {
+		dom.taskContainer.removeAllTasks();
+		todolist.getByProject().forEach((taskObj, index) => {
+			dom.taskContainer.createTask(index, taskObj.getInfo());
+		});
+	}
 }
 
 function startFlowAddTask() {
@@ -33,7 +59,8 @@ function startFlowAddTask() {
 		const formInputs = getFormInput();
 		const taskIndex = todolist.create(formInputs);
 		const taskObj = todolist.getTask(taskIndex);
-		dom.taskDiv.create(taskIndex, taskObj.getInfo());
+		dom.taskContainer.createTask(taskIndex, taskObj.getInfo());
+		dom.sidebar.createItem("add", taskObj.getInfo().project);
 		dom.formModal.close();
 	}
 }
