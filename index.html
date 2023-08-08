@@ -15,11 +15,11 @@
 			<header><h1 id="header--topmost">FocusFlow</h1></header>
 			<nav id="sidebar">
 				<ul id="sidebar__items-list">
-					<li class="sidebar__item"><span>Home</span></li>
+					<li id="sidebar__home-item" class="sidebar__item">
+						<span>Home</span>
+					</li>
 					<li>
-						<ul id="projects-container">
-							<li class="sidebar__item"><span>Dummy Project</span></li>
-						</ul>
+						<ul id="projects-container"></ul>
 					</li>
 				</ul>
 			</nav>
@@ -67,22 +67,7 @@
 					</form>
 				</dialog>
 				<button id="btn-cta">Add New Task</button>
-				<div id="tasks-container">
-					<div class="task task--completed">
-						<div class="task__wrapper">
-							<button class="task__check-btn material-symbols-rounded">
-								check_box
-							</button>
-							<span class="task__title">dummy task title</span>
-							<span class="task__duedate">date</span>
-						</div>
-						<div class="task__wrapper">
-							<button class="task__info-btn">info</button>
-							<button class="task__edit-btn">edit</button>
-							<button class="task__delete-btn">delete</button>
-						</div>
-					</div>
-				</div>
+				<div id="tasks-container"></div>
 			</main>
 			<footer>
 				<a href="https://github.com/yash-aryan/" target="_blank"
