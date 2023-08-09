@@ -20,7 +20,6 @@ FocusFlow is a simple **To-Do List web-app** project that I **created using vani
   - `todolistHandler.js` exports todolist function that maintains tasks in a main array, which can be filtered & looped over.
 - Tasks can be created via the "Add New Task" Button, which opens up a form that gets the inputs.
 - After every browser re-open/refresh, tasks objects are automatically added back to the todolist from the localStorage.
-- A Named IIFE `todolist` is exposed globally which returns an object with bunch of useful functions, allowing me to test the core logic.
 
 # Project Status
 
@@ -28,6 +27,6 @@ FocusFlow is a simple **To-Do List web-app** project that I **created using vani
 - [x] Create Function to Add New Tasks
 - [x] Create Function to Toggle Task Status
 - [x] Create Function to View All Tasks of Same Project
-- [ ] Create Function to View Task Info
+- [x] Create Function to View Task Info
 - [ ] Create Function to Edit Task
 - [ ] Create Function to Delete Task

@@ -4,7 +4,6 @@ import todolist from "./todolistHandler";
 import dom from "./domHandler";
 import storage from "./storageHandler";
 
-window.todolist = todolist;
 // Restore tasks objects back to todolist after every reload/refresh.
 if (storage.size() !== 0) {
 	for (let index = 0; index < storage.size(); index++) {
@@ -14,6 +13,15 @@ if (storage.size() !== 0) {
 	}
 }
 
+document
+	.querySelector("#form-modal")
+	.addEventListener("close", dom.formModal.close);
+document
+	.querySelector("#form-modal__close-btn")
+	.addEventListener("click", dom.formModal.close);
+document
+	.querySelector("#info-modal__close-btn")
+	.addEventListener("click", dom.infoModal.close);
 document
 	.querySelector("#tasks-container")
 	.addEventListener("click", taskEventHandler);
@@ -25,29 +33,23 @@ document.querySelector("#btn-cta").addEventListener("click", startFlowAddTask);
 function taskEventHandler(e) {
 	const node = e.target;
 	if (node.closest(".task") === null) return;
-	if (node.closest("button.task__check-btn")) {
-		const taskNode = node.closest("div.task");
-		const taskObj = todolist.getTask(taskNode.dataset.index);
+
+	const taskNode = node.closest("div.task");
+	const taskObj = todolist.getTask(taskNode.dataset.index);
+
+	if (node.closest(".task__check-btn")) {
 		taskObj.toggleTaskStatus();
 		dom.taskContainer.toggleTaskState(taskNode);
+	} else if (node.closest(".task__info-btn")) {
+		dom.infoModal.display(taskObj.getInfo());
 	}
 }
 
 function sidebarEventHandler(e) {
 	const node = e.target;
-	if (node.closest(".sidebar__item") && node.closest("#projects-container")) {
-		const childNode = node.closest(".sidebar__item").querySelector("span");
-		dom.taskContainer.removeAllTasks();
-		todolist.getByProject(childNode.innerText).forEach(taskObj => {
-			const index = todolist.getByProject().indexOf(taskObj);
-			dom.taskContainer.createTask(index, taskObj.getInfo());
-		});
-	} else if (node.closest("#sidebar__home-item")) {
-		dom.taskContainer.removeAllTasks();
-		todolist.getByProject().forEach((taskObj, index) => {
-			dom.taskContainer.createTask(index, taskObj.getInfo());
-		});
-	}
+	if (node.closest(".sidebar__item") && node.closest("#projects-container"))
+		createTasksOfSameProject(node);
+	else if (node.closest("#sidebar__home-item")) createAllTasks();
 }
 
 function startFlowAddTask() {
@@ -63,6 +65,22 @@ function startFlowAddTask() {
 		dom.sidebar.createItem("add", taskObj.getInfo().project);
 		dom.formModal.close();
 	}
+}
+
+function createTasksOfSameProject(node) {
+	const childNode = node.closest(".sidebar__item").querySelector("span");
+	dom.taskContainer.removeAllTasks();
+	todolist.getByProject(childNode.innerText).forEach(taskObj => {
+		const index = todolist.getByProject().indexOf(taskObj);
+		dom.taskContainer.createTask(index, taskObj.getInfo());
+	});
+}
+
+function createAllTasks() {
+	dom.taskContainer.removeAllTasks();
+	todolist.getByProject().forEach((taskObj, index) => {
+		dom.taskContainer.createTask(index, taskObj.getInfo());
+	});
 }
 
 function getFormInput() {

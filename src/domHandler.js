@@ -3,8 +3,9 @@ import { format, parseISO } from "date-fns";
 
 // Module that deals with modfying the DOM.
 
+// <dialog id="form-modal">
 const formModal = (() => {
-	const modal = document.querySelector("#modal");
+	const modal = document.querySelector("#form-modal");
 	function open() {
 		modal.showModal();
 	}
@@ -20,12 +21,13 @@ const formModal = (() => {
 	};
 })();
 
+// <div id="tasks-container">
 const taskContainer = (() => {
 	const container = document.querySelector("#tasks-container");
 
 	function createTask(index, taskInfo) {
 		const task = document.createElement("div");
-		task.className = fetchTaskClasses(); // task element classes
+		task.className = fetchTaskClasses(taskInfo.completed); // task element classes
 		task.dataset.index = index; // Storing task index in DOM as data attribute
 
 		const task__group = document.createElement("div");
@@ -33,7 +35,7 @@ const taskContainer = (() => {
 		const task__checkBtn = document.createElement("button");
 		task__checkBtn.classList.add("task__check-btn", "material-symbols-rounded");
 		const status = taskInfo.completed ? " task--completed" : "";
-		task__checkBtn.textContent = fetchCheckBtnStatus(); // checkbox
+		task__checkBtn.textContent = fetchCheckBtnStatus(taskInfo.completed); // checkbox
 		const task__title = document.createElement("span");
 		task__title.classList.add("task__title");
 		task__title.textContent = taskInfo.title; // task title
@@ -58,20 +60,12 @@ const taskContainer = (() => {
 		task.append(task__group, task__group2);
 		container.append(task);
 
-		function fetchTaskClasses() {
-			const status = taskInfo.completed ? " task--completed" : "";
-			return "task" + status;
+		function fetchTaskClasses(completed) {
+			return completed ? "task task--completed" : "task";
 		}
 
-		function fetchCheckBtnStatus() {
-			return taskInfo.completed ? "check_box" : "check_box_outline_blank";
-		}
-
-		// Date-fns function to format ISO date to something like "12th Jun 2023, 11:20 PM".
-		function formatDate(dateISO) {
-			if (dateISO === "") return "no duedate";
-			const parsedDate = parseISO(dateISO);
-			return format(parsedDate, "do MMM y");
+		function fetchCheckBtnStatus(completed) {
+			return completed ? "check_box" : "check_box_outline_blank";
 		}
 	}
 
@@ -102,6 +96,7 @@ const taskContainer = (() => {
 	};
 })();
 
+// <div id="projects-container">
 const sidebar = (() => {
 	const container = document.querySelector("#projects-container");
 
@@ -109,23 +104,23 @@ const sidebar = (() => {
 		if (projectName === "") return;
 		switch (action) {
 			case "restore":
-				startCreating();
+				startCreating(projectName);
 				break;
 			case "add":
-				if (doesProjectAlreadyExist) return console.log("this ran");
+				if (doesProjectAlreadyExist(projectName)) return;
 				startCreating();
 				break;
 			default:
 				return;
 		}
 
-		function doesProjectAlreadyExist() {
+		function doesProjectAlreadyExist(projectName) {
 			return Array.from(
 				document.querySelectorAll("#projects-container > .sidebar__item > span")
 			).some(item => projectName === item.innerText);
 		}
 
-		function startCreating() {
+		function startCreating(projectName) {
 			const sidebar__item = document.createElement("li");
 			sidebar__item.classList.add("sidebar__item");
 			const span = document.createElement("span");
@@ -141,8 +136,63 @@ const sidebar = (() => {
 	};
 })();
 
+// <dialog id="info-modal">
+const infoModal = (() => {
+	const modal = document.querySelector("#info-modal");
+	const titleNode = document.querySelector("#title-info");
+	const duedateNode = document.querySelector("#duedate-info");
+	const descNode = document.querySelector("#desc-info");
+	const priorityNode = document.querySelector("#priority-info");
+	const projectNode = document.querySelector("#project-info");
+	const completedNode = document.querySelector("#completed-info");
+
+	function display(taskObj) {
+		modal.showModal();
+		titleNode.textContent = taskObj.title;
+		duedateNode.textContent = formatDate(taskObj.duedate);
+		descNode.textContent = fetchInfoData("desc", taskObj);
+		priorityNode.textContent = taskObj.priority;
+		projectNode.textContent = fetchInfoData("project", taskObj);
+		completedNode.textContent = fetchInfoData("completed", taskObj);
+	}
+
+	function close() {
+		titleNode.textContent = "";
+		duedateNode.textContent = "";
+		descNode.textContent = "";
+		priorityNode.textContent = "";
+		projectNode.textContent = "";
+		completedNode.textContent = "";
+		modal.close();
+	}
+
+	function fetchInfoData(type, taskObj) {
+		switch (type) {
+			case "desc":
+				return taskObj.desc === "" ? "<no description>" : taskObj.desc;
+			case "project":
+				return taskObj.project === "" ? "<no project>" : taskObj.project;
+			case "completed":
+				return taskObj.completed ? "Completed!" : "Not yet completed";
+		}
+	}
+
+	return {
+		display,
+		close,
+	};
+})();
+
+// Date-fns function to format ISO date to something like "12th Jun 2023, 11:20 PM".
+function formatDate(dateISO) {
+	if (dateISO === "") return "<no duedate>";
+	const parsedDate = parseISO(dateISO);
+	return format(parsedDate, "do MMM y");
+}
+
 export default {
 	formModal,
 	taskContainer,
 	sidebar,
+	infoModal,
 };
