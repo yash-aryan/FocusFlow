@@ -16,7 +16,7 @@
 			<nav id="sidebar">
 				<ul id="sidebar__items-list">
 					<li id="sidebar__home-item" class="sidebar__item">
-						<span>Home</span>
+						<span>All Tasks</span>
 					</li>
 					<li>
 						<ul id="projects-container"></ul>
@@ -24,7 +24,13 @@
 				</ul>
 			</nav>
 			<main id="main-wrapper">
-				<dialog id="modal">
+				<dialog id="form-modal">
+					<div class="modal-header">
+						<h2 id="form-modal__action">Add Task</h2>
+						<button id="form-modal__close-btn" class="modal-close-btn">
+							Cancel
+						</button>
+					</div>
 					<form action="" id="form">
 						<div class="form__item">
 							<label for="input-title">Title</label>
@@ -32,13 +38,18 @@
 						</div>
 						<div class="form__item">
 							<label for="input-desc">Short Description</label>
-							<input type="text" name="desc" id="input-desc" />
+							<textarea
+								name="desc"
+								id="input-desc"
+								cols="30"
+								rows="5"
+							></textarea>
 						</div>
 						<div class="form__item">
 							<label for="input-duedate">Duedate</label>
 							<input type="date" name="duedate" id="input-duedate" />
 						</div>
-						<div class="form__item">
+						<div id="form__radio" class="form__item">
 							<div class="form__item__chip">
 								<label for="priority-normal">Normal</label>
 								<input
@@ -65,6 +76,38 @@
 						</div>
 						<button type="submit" id="form__submit-btn">Confirm</button>
 					</form>
+				</dialog>
+				<dialog id="info-modal">
+					<div id="info-modal__container">
+						<div class="modal-header">
+							<div class="info-modal__item">
+								<h2 id="title-info"></h2>
+							</div>
+							<button id="info-modal__close-btn" class="modal-close-btn">
+								Cancel
+							</button>
+						</div>
+						<div id="info-modal__desc" class="info-modal__item">
+							<span class="info-modal__item-header">Description</span>
+							<span id="desc-info"></span>
+						</div>
+						<div class="info-modal__item">
+							<span class="info-modal__item-header">Duedate</span>
+							<span id="duedate-info"></span>
+						</div>
+						<div class="info-modal__item">
+							<span class="info-modal__item-header">Priority</span>
+							<span id="priority-info"></span>
+						</div>
+						<div class="info-modal__item">
+							<span class="info-modal__item-header">Project</span>
+							<span id="project-info"></span>
+						</div>
+						<div class="info-modal__item">
+							<span class="info-modal__item-header">Status</span>
+							<span id="completed-info"></span>
+						</div>
+					</div>
 				</dialog>
 				<button id="btn-cta">Add New Task</button>
 				<div id="tasks-container"></div>
