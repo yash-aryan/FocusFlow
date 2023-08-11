@@ -28,5 +28,6 @@ FocusFlow is a simple **To-Do List web-app** project that I **created using vani
 - [x] Create Function to Toggle Task Status
 - [x] Create Function to View All Tasks of Same Project
 - [x] Create Function to View Task Info
-- [ ] Create Function to Edit Task
+- [x] Create Function to Edit Task
 - [ ] Create Function to Delete Task
+- [ ] Update UI's Visual Design

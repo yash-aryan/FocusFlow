@@ -1,6 +1,11 @@
 "use strict";
 
-// Module that deals with creating task objects
+/* OVERVIEW:
+- Module that deals with creating task objects.
+- Takes object as input & returns a task object, with useful functions.
+- Keep the UI related data SEPERATE from the data inputted to this module (e.g. Inputted duedate must only be in ISO format).
+*/
+
 function taskFactory(taskInputs) {
 	let title = taskInputs.title,
 		duedate = taskInputs.duedate,

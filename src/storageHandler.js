@@ -1,6 +1,10 @@
 "use strict";
 
-// Module that deals with how tasks are stored after closing the browser. Uses localStorage.
+/* OVERVIEW:
+- Module that deals with how tasks are stored after closing the browser.
+- Currently only uses browser's localStorage.
+*/
+
 const storage = (() => {
 	function size() {
 		return localStorage.length;

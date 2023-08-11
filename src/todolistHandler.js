@@ -2,7 +2,10 @@
 import taskFactory from "./taskFactory";
 import storage from "./storageHandler";
 
-// Module that deals with maintaing tasks in Array for rapid modification.
+/* OVERVIEW:
+- Module that deals with maintaing tasks in Array for rapid modification.
+*/
+
 const todolist = (() => {
 	let todolist = [];
 

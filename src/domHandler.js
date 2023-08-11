@@ -1,13 +1,40 @@
 "use strict";
 import { format, parseISO } from "date-fns";
 
-// Module that deals with modfying the DOM.
+/* OVERVIEW:
+- Module that deals with modfying the DOM.
+- Create Module pattern IIFE for every parent element which undergoes modifications.
+- Each IIFE returns an object exposing ONLY certain functions to be used elsewhere.
+- Helper functions are NOT exposed, and are kept at the very bottom of the scope.
+- Comment the concerning parent HTML element above it's function.
+*/
 
 // <dialog id="form-modal">
 const formModal = (() => {
 	const modal = document.querySelector("#form-modal");
+
 	function open() {
 		modal.showModal();
+	}
+
+	function openPrefilled(taskInfo) {
+		open();
+		document.querySelector("#input-title").value = taskInfo.title;
+		document.querySelector("#input-desc").value = taskInfo.desc;
+		document.querySelector("#input-duedate").value = taskInfo.duedate;
+		switch (taskInfo.priority) {
+			case "normal":
+				document.querySelector("#priority-normal").checked = true;
+				break;
+			case "high":
+				document.querySelector("#priority-high").checked = true;
+				break;
+		}
+		document.querySelector("#input-project").value = taskInfo.project;
+	}
+
+	function changeAction(inputText) {
+		document.querySelector("#form-modal__action").textContent = inputText;
 	}
 
 	function close() {
@@ -17,6 +44,8 @@ const formModal = (() => {
 
 	return {
 		open,
+		openPrefilled,
+		changeAction,
 		close,
 	};
 })();
@@ -27,15 +56,14 @@ const taskContainer = (() => {
 
 	function createTask(index, taskInfo) {
 		const task = document.createElement("div");
-		task.className = fetchTaskClasses(taskInfo.completed); // task element classes
+		task.className = fetchTaskClasses(); // task element classes
 		task.dataset.index = index; // Storing task index in DOM as data attribute
 
 		const task__group = document.createElement("div");
 		task__group.classList.add("task__wrapper");
 		const task__checkBtn = document.createElement("button");
 		task__checkBtn.classList.add("task__check-btn", "material-symbols-rounded");
-		const status = taskInfo.completed ? " task--completed" : "";
-		task__checkBtn.textContent = fetchCheckBtnStatus(taskInfo.completed); // checkbox
+		task__checkBtn.textContent = fetchCheckBtnStatus(); // checkbox
 		const task__title = document.createElement("span");
 		task__title.classList.add("task__title");
 		task__title.textContent = taskInfo.title; // task title
@@ -60,17 +88,13 @@ const taskContainer = (() => {
 		task.append(task__group, task__group2);
 		container.append(task);
 
-		function fetchTaskClasses(completed) {
-			return completed ? "task task--completed" : "task";
+		function fetchTaskClasses() {
+			return taskInfo.completed ? "task task--completed" : "task";
 		}
 
-		function fetchCheckBtnStatus(completed) {
-			return completed ? "check_box" : "check_box_outline_blank";
+		function fetchCheckBtnStatus() {
+			return taskInfo.completed ? "check_box" : "check_box_outline_blank";
 		}
-	}
-
-	function removeTask(node) {
-		node.remove();
 	}
 
 	function toggleTaskState(node) {
@@ -84,55 +108,67 @@ const taskContainer = (() => {
 		}
 	}
 
+	function editTask(index, taskInfo) {
+		const task = document.querySelector(`.task[data-index="${index}"]`);
+		task.querySelector(".task__title").textContent = taskInfo.title;
+		task.querySelector(".task__duedate").textContent = formatDate(
+			taskInfo.duedate
+		);
+	}
+
+	function removeTask(node) {
+		node.remove();
+	}
+
 	function removeAllTasks() {
 		container.innerHTML = "";
 	}
 
 	return {
 		createTask,
-		removeTask,
 		toggleTaskState,
+		editTask,
+		removeTask,
 		removeAllTasks,
 	};
 })();
 
 // <div id="projects-container">
-const sidebar = (() => {
+const projectContainer = (() => {
 	const container = document.querySelector("#projects-container");
 
-	function createItem(action, projectName = "") {
+	function addNewItem(projectName) {
 		if (projectName === "") return;
-		switch (action) {
-			case "restore":
-				startCreating(projectName);
-				break;
-			case "add":
-				if (doesProjectAlreadyExist(projectName)) return;
-				startCreating();
-				break;
-			default:
-				return;
+		if (doesProjectAlreadyExist()) return;
+		create(projectName);
+
+		function doesProjectAlreadyExist() {
+			const items = Array.from(document.querySelectorAll(".project-name"));
+			if (items.length === 0) return false;
+			return items.some(node => projectName === node.innerText);
 		}
 
-		function doesProjectAlreadyExist(projectName) {
-			return Array.from(
-				document.querySelectorAll("#projects-container > .sidebar__item > span")
-			).some(item => projectName === item.innerText);
-		}
-
-		function startCreating(projectName) {
+		function create(projectName) {
 			const sidebar__item = document.createElement("li");
 			sidebar__item.classList.add("sidebar__item");
 			const span = document.createElement("span");
+			span.classList.add("project-name");
 			span.textContent = projectName;
-
 			sidebar__item.append(span);
 			container.append(sidebar__item);
 		}
 	}
 
+	function removeItem(projectName) {
+		document.querySelectorAll(".project-name").forEach(node => {
+			if (projectName === node.innerText)
+				node.closest(".sidebar__item").remove();
+		});
+	}
+
 	return {
-		createItem,
+		addNewItem,
+		removeItem,
 	};
 })();
 
@@ -146,14 +182,25 @@ const infoModal = (() => {
 	const projectNode = document.querySelector("#project-info");
 	const completedNode = document.querySelector("#completed-info");
 
-	function display(taskObj) {
+	function display(taskInfo) {
 		modal.showModal();
-		titleNode.textContent = taskObj.title;
-		duedateNode.textContent = formatDate(taskObj.duedate);
-		descNode.textContent = fetchInfoData("desc", taskObj);
-		priorityNode.textContent = taskObj.priority;
-		projectNode.textContent = fetchInfoData("project", taskObj);
-		completedNode.textContent = fetchInfoData("completed", taskObj);
+		titleNode.textContent = taskInfo.title;
+		duedateNode.textContent = formatDate(taskInfo.duedate);
+		descNode.textContent = fetchInfoData("desc");
+		priorityNode.textContent = taskInfo.priority;
+		projectNode.textContent = fetchInfoData("project");
+		completedNode.textContent = fetchInfoData("completed");
+
+		function fetchInfoData(type) {
+			switch (type) {
+				case "desc":
+					return taskInfo.desc === "" ? "<no description>" : taskInfo.desc;
+				case "project":
+					return taskInfo.project === "" ? "<no project>" : taskInfo.project;
+				case "completed":
+					return taskInfo.completed ? "Completed!" : "Not yet completed";
+			}
+		}
 	}
 
 	function close() {
@@ -164,17 +211,6 @@ const infoModal = (() => {
 		projectNode.textContent = "";
 		completedNode.textContent = "";
 		modal.close();
-	}
-
-	function fetchInfoData(type, taskObj) {
-		switch (type) {
-			case "desc":
-				return taskObj.desc === "" ? "<no description>" : taskObj.desc;
-			case "project":
-				return taskObj.project === "" ? "<no project>" : taskObj.project;
-			case "completed":
-				return taskObj.completed ? "Completed!" : "Not yet completed";
-		}
 	}
 
 	return {
@@ -193,6 +229,6 @@ function formatDate(dateISO) {
 export default {
 	formModal,
 	taskContainer,
-	sidebar,
+	projectContainer,
 	infoModal,
 };
