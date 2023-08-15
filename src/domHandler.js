@@ -2,11 +2,9 @@
 import { format, parseISO } from "date-fns";
 
 /* OVERVIEW:
-- Module that deals with modfying the DOM.
-- Create Module pattern IIFE for every parent element which undergoes modifications.
-- Each IIFE returns an object exposing ONLY certain functions to be used elsewhere.
-- Helper functions are NOT exposed, and are kept at the very bottom of the scope.
-- Comment the concerning parent HTML element above it's function.
+- This is the Module that deals with modfying the DOM.
+- Created a named IIFE which returns only a certain functions for each relevant parent element.
+- Commented the concerning parent HTML element above it's function.
 */
 
 // <dialog id="form-modal">
@@ -150,7 +148,8 @@ const projectContainer = (() => {
 
 		function create(projectName) {
 			const sidebar__item = document.createElement("li");
-			sidebar__item.classList.add("sidebar__item");
+			sidebar__item.dataset.taskView = projectName; // data-task-view
+			sidebar__item.classList.add("sidebar__item", "project__item");
 			const span = document.createElement("span");
 			span.classList.add("project-name");
 			span.textContent = projectName;
@@ -160,9 +159,10 @@ const projectContainer = (() => {
 	}
 
 	function removeItem(projectName) {
+		// Finds & deletes entire .sidebar__item node with innerText === projectName.
 		document.querySelectorAll(".project-name").forEach(node => {
 			if (projectName === node.innerText)
-				node.closest(".sidebar__item").remove();
+				node.closest(".project__item").remove();
 		});
 	}
 

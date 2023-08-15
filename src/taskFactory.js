@@ -1,18 +1,18 @@
 "use strict";
 
 /* OVERVIEW:
-- Module that deals with creating task objects.
-- Takes object as input & returns a task object, with useful functions.
-- Keep the UI related data SEPERATE from the data inputted to this module (e.g. Inputted duedate must only be in ISO format).
+- This is the module that deals with creating task objects.
+- Takes object with task data received from user as input & returns a task object, with certain functions.
+- The UI related data is kept seperately from the data inputted into the factory (e.g. Inputted duedate must only be in ISO format).
 */
 
 function taskFactory(taskInputs) {
-	let title = taskInputs.title,
+	const title = taskInputs.title,
 		duedate = taskInputs.duedate,
 		desc = taskInputs.desc,
 		priority = taskInputs.priority,
-		project = taskInputs.project,
-		completed = false;
+		project = taskInputs.project;
+	let completed = false;
 
 	function getInfo() {
 		return {
@@ -25,36 +25,13 @@ function taskFactory(taskInputs) {
 		};
 	}
 
-	function editTask(type, value) {
-		switch (type) {
-			case "title":
-				title = value;
-				break;
-			case "duedate":
-				duedate = value;
-				break;
-			case "desc":
-				desc = value;
-				break;
-			case "priority":
-				priority = value;
-				break;
-			case "project":
-				project = value;
-				break;
-			default:
-				return console.log("invalid case in editTask()");
-		}
-	}
-
-	function toggleTaskStatus() {
+	function toggleStatus() {
 		completed = completed ? false : true;
 	}
 
 	return {
 		getInfo,
-		editTask,
-		toggleTaskStatus,
+		toggleStatus,
 	};
 }
 

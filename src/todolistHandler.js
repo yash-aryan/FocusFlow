@@ -1,57 +1,86 @@
 "use strict";
 import taskFactory from "./taskFactory";
-import storage from "./storageHandler";
 
 /* OVERVIEW:
-- Module that deals with maintaing tasks in Array for rapid modification.
+- This is the module that deals with maintaing tasks for persistance & rapid modification.
+- Has access to storage implementation via storageFactory.
+- Has access to taskFactory to create task objects.
 */
 
 const todolist = (() => {
-	let todolist = [];
+	const todolistArr = [];
+	const storage = storageFactory();
 
-	function create(taskInputs) {
-		const newTask = taskFactory(taskInputs);
-		todolist.push(newTask);
-		const index = todolist.indexOf(newTask);
-		storage.save(index, newTask);
-		return index;
+	function createTask(taskInputs) {
+		const taskObj = taskFactory(taskInputs);
+		todolistArr.push(taskObj);
+		storage.saveToStorage(splitTaskObj(todolistArr));
+		return todolistArr.length - 1;
 	}
 
 	function getTask(index) {
-		return todolist[index];
+		return todolistArr[index];
 	}
 
-	function edit(index, type, value) {
-		todolist[index].editTask(type, value);
-		// Also modifies from the storage
-		const updatedTask = todolist[index].getInfo();
-		storage.modify(index, updatedTask);
+	function editTask(index, newInputs) {
+		const taskObj = taskFactory(newInputs);
+		todolistArr[index] = taskObj;
+		storage.saveToStorage(splitTaskObj(todolistArr));
 	}
 
 	function removeAt(index) {
-		todolist.splice(index, 1);
-		storage.removeAt(index);
+		todolistArr.splice(index, 1);
+		storage.saveToStorage(splitTaskObj(todolistArr));
 	}
 
-	function restoreTask(index) {
-		const taskObj = taskFactory(storage.getFrom(index));
-		todolist.push(taskObj);
-		return taskObj;
+	function getAllTasks() {
+		return [...todolistArr];
 	}
 
-	function getByProject(name = "") {
-		if (name === "") return [...todolist];
-		return todolist.filter(n => n.getInfo().project === name);
+	function restoreTodolistFromStorage() {
+		// Rebuilding taskObj from taskInfo stored in the storage, and pushing it into todolistArr.
+		const taskInfoArr = storage.getFromStorage();
+		if (!taskInfoArr) return;
+		taskInfoArr.forEach(taskInfo => todolistArr.push(taskFactory(taskInfo)));
+	}
+
+	function getByProject(name) {
+		if (name === "") getAllTasks();
+		return todolistArr.filter(n => n.getInfo().project === name);
+	}
+
+	function splitTaskObj(inputTodolist) {
+		// Takes array with taskObj as input & returns a NEW array with taskInfo as output.
+		// Where taskInfo contains raw data that are not a function.
+		return inputTodolist.map(n => n.getInfo());
 	}
 
 	return {
-		create,
+		createTask,
 		getTask,
-		edit,
+		editTask,
 		removeAt,
-		restoreTask,
+		getAllTasks,
+		restoreTodolistFromStorage,
 		getByProject,
 	};
 })();
+
+// Abstracts away any external storage API or methods. Currently only uses browser's localStorage.
+function storageFactory() {
+	function saveToStorage(taskInfoArr) {
+		localStorage.setItem("todolist", JSON.stringify(taskInfoArr));
+	}
+
+	function getFromStorage() {
+		if (localStorage.getItem("todolist") === undefined) debugger;
+		return JSON.parse(localStorage.getItem("todolist"));
+	}
+
+	return {
+		saveToStorage,
+		getFromStorage,
+	};
+}
 
 export default todolist;

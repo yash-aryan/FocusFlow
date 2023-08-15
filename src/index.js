@@ -2,23 +2,21 @@
 import "./style.css";
 import todolist from "./todolistHandler";
 import dom from "./domHandler";
-import storage from "./storageHandler";
 
 /* OVERVIEW:
 - This is the MAIN module that deals deals with event handling & deciding actions to take on each step.
-- If some event causes a series of steps, then it is classified under a "FLOW" (e.g. Add Task Flow, Edit Task FLow).
-- Import functions from other modules and provide relevant inputs to cause a change.
-- Do NOT modify the DOM or task objects directly from this module.
+- This module doesn't modify DOM or Task Objects directly.
 */
-
+window.todolist = todolist;
 // Restore tasks objects back to todolist after every reload/refresh.
-if (storage.size() !== 0) {
-	for (let index = 0; index < storage.size(); index++) {
-		const taskObj = todolist.restoreTask(index);
-		dom.taskContainer.createTask(index, taskObj.getInfo());
-		dom.projectContainer.addNewItem(taskObj.getInfo().project);
-	}
-}
+todolist.restoreTodolistFromStorage();
+
+todolist.getAllTasks().forEach((taskObj, index) => {
+	dom.taskContainer.createTask(index, taskObj.getInfo());
+	dom.projectContainer.addNewItem(taskObj.getInfo().project);
+});
+
+let currentTaskView = "";
 
 // ---PERMANENT EVENT LISTENERS---
 
@@ -39,24 +37,34 @@ if (storage.size() !== 0) {
 
 function taskEventHandler(e) {
 	const node = e.target;
-	if (node.closest(".task") === null) return;
+	if (!node.closest(".task")) return;
 
 	const taskNode = node.closest("div.task");
 	const taskObj = todolist.getTask(taskNode.dataset.index);
 
 	if (node.closest(".task__check-btn")) {
-		taskObj.toggleTaskStatus();
+		taskObj.toggleStatus();
 		dom.taskContainer.toggleTaskState(taskNode);
 	} else if (node.closest(".task__info-btn")) {
 		dom.infoModal.display(taskObj.getInfo());
 	} else if (node.closest(".task__edit-btn")) editTaskFlow(taskNode, taskObj);
+	else if (node.closest(".task__delete-btn")) deleteTaskFlow(taskNode);
 }
 
 function sidebarEventHandler(e) {
 	const node = e.target;
-	if (node.closest(".sidebar__item") && node.closest("#projects-container"))
-		createTasksOfSameProject(node);
-	else if (node.closest("#sidebar__home-item")) createAllTasks();
+	const item = node.closest(".sidebar__item");
+	if (!node.closest(".sidebar__item") || isAlreadyOnSameTaskView()) return;
+
+	if (item.id === "sidebar__home-item") displayAllTasks();
+	else displayTasksByProject(item.dataset.taskView);
+
+	currentTaskView = item.dataset.taskView;
+
+	function isAlreadyOnSameTaskView() {
+		if (item.dataset.taskView === currentTaskView) return true;
+		else return false;
+	}
 }
 
 // ---FLOW HANDLER functions---
@@ -74,7 +82,7 @@ function addTaskFlow() {
 		formModal.removeEventListener("close", stopFlow);
 
 		const formInputs = getFormInput();
-		const taskIndex = todolist.create(formInputs);
+		const taskIndex = todolist.createTask(formInputs);
 		const taskObj = todolist.getTask(taskIndex);
 		dom.taskContainer.createTask(taskIndex, taskObj.getInfo());
 		dom.projectContainer.addNewItem(taskObj.getInfo().project);
@@ -100,23 +108,11 @@ function editTaskFlow(taskNode, taskObj) {
 	function editTask(e) {
 		e.preventDefault();
 		const formInputs = getFormInput();
-		for (const type in formInputs) {
-			todolist.edit(taskIndex, type, formInputs[type]);
-		}
-		dom.taskContainer.editTask(taskIndex, taskObj.getInfo());
-		dom.projectContainer.addNewItem(taskObj.getInfo().project);
+		todolist.editTask(taskIndex, formInputs);
+		dom.taskContainer.editTask(taskIndex, formInputs);
+		dom.projectContainer.addNewItem(formInputs.project);
 		removeAllEmptyProjects();
 		dom.formModal.close();
-	}
-
-	function removeAllEmptyProjects() {
-		const projectsArray = Array.from(
-			document.querySelectorAll(".project-name")
-		);
-		projectsArray.forEach(projectName => {
-			if (todolist.getByProject(projectName).length === 0)
-				dom.projectContainer.removeItem(projectName);
-		});
 	}
 
 	function stopFlow() {
@@ -125,20 +121,36 @@ function editTaskFlow(taskNode, taskObj) {
 	}
 }
 
-// ---CURRENT TASK DISPLAYING functions---
+function deleteTaskFlow(taskNode) {
+	dom.taskContainer.removeTask(taskNode);
+	todolist.removeAt(taskNode.dataset.index);
 
-function createTasksOfSameProject(node) {
-	const childNode = node.closest(".sidebar__item").querySelector("span");
+	// Re-displaying the last view to sync all data-index value after deletion.
+	// If task container gets empty in current view, then load all tasks view.
+	if (document.querySelector("#tasks-container").innerHTML === "") {
+		currentTaskView = "";
+		displayAllTasks();
+	} else {
+		if (currentTaskView === "") displayAllTasks();
+		else displayTasksByProject(currentTaskView);
+	}
+	removeAllEmptyProjects();
+}
+
+// ---TASK DISPLAYING functions---
+
+function displayTasksByProject(projectName) {
 	dom.taskContainer.removeAllTasks();
-	todolist.getByProject(childNode.innerText).forEach(taskObj => {
-		const index = todolist.getByProject().indexOf(taskObj);
+	todolist.getByProject(projectName).forEach(taskObj => {
+		// Assigning index from the main todolist.
+		const index = todolist.getAllTasks().indexOf(taskObj);
 		dom.taskContainer.createTask(index, taskObj.getInfo());
 	});
 }
 
-function createAllTasks() {
+function displayAllTasks() {
 	dom.taskContainer.removeAllTasks();
-	todolist.getByProject().forEach((taskObj, index) => {
+	todolist.getAllTasks().forEach((taskObj, index) => {
 		dom.taskContainer.createTask(index, taskObj.getInfo());
 	});
 }
@@ -161,4 +173,13 @@ function getFormInput() {
 		priority,
 		project,
 	};
+}
+
+function removeAllEmptyProjects() {
+	document.querySelectorAll(".project__item").forEach(node => {
+		const projectName = node.dataset.taskView;
+		if (todolist.getByProject(projectName).length === 0) {
+			dom.projectContainer.removeItem(projectName);
+		}
+	});
 }
