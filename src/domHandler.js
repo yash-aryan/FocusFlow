@@ -87,7 +87,10 @@ const taskContainer = (() => {
 		container.append(task);
 
 		function fetchTaskClasses() {
-			return taskInfo.completed ? "task task--completed" : "task";
+			const classNames = [];
+			classNames.push(taskInfo.completed ? "task task--completed" : "task");
+			classNames.push(taskInfo.priority === "normal"? "normal" : "high");
+			return classNames.join(" ");
 		}
 
 		function fetchCheckBtnStatus() {
