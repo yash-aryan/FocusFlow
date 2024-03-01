@@ -5,121 +5,114 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>FocusFlow - To-Do List</title>
 		<script src="./bundle.js" defer></script>
-		<link
-			rel="stylesheet"
-			href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
-		/>
 	</head>
 	<body>
 		<div id="root-container">
-			<header><h1 id="header--topmost">FocusFlow</h1></header>
-			<nav id="sidebar">
-				<ul id="sidebar__items-list">
-					<li id="sidebar__home-item" class="sidebar__item" data-task-view="">
-						<span>All Tasks</span>
-					</li>
-					<li>
-						<ul id="projects-container"></ul>
+			<header class="header"><h1 class="topmost-header">FocusFlow</h1></header>
+			<nav class="sidebar">
+				<ul class="sidebar-list js-groups">
+					<li class="sidebar-list__item">
+						<button
+							id="home-item"
+							class="sidebar-list__button sidebar-list__button--home active"
+						>
+							Home
+						</button>
 					</li>
 				</ul>
 			</nav>
-			<main id="main-wrapper">
-				<dialog id="form-modal">
-					<div class="modal-header">
-						<h2 id="form-modal__action">Add Task</h2>
-						<button id="form-modal__close-btn" class="modal-close-btn">
-							Cancel
-						</button>
+			<main class="main-wrapper">
+				<dialog id="form-modal" class="form-modal">
+					<div class="modal__child-wrap">
+						<div class="modal-header">
+							<h2 class="form-modal__action">Add Task</h2>
+							<button class="form-modal__close-btn modal-close-btn">Cancel</button>
+						</div>
+						<form class="form-modal__form">
+							<label class="form__item">
+								Title
+								<input type="text" name="title" id="input-title" required />
+							</label>
+							<label class="form__item">
+								Task Description
+								<textarea name="desc" id="input-desc" cols="30" rows="3"></textarea>
+							</label>
+
+							<label class="form__item">
+								Duedate
+								<input type="date" name="duedate" id="input-duedate" />
+							</label>
+							<fieldset class="form__radio-wrap form__item">
+								<legend>Task Priority</legend>
+								<label class="form__radio-item">
+									Normal
+									<input
+										type="radio"
+										name="priority"
+										value="normal"
+										id="priority-normal"
+										class="input-clickables"
+										checked
+									/>
+								</label>
+								<label class="form__radio-item">
+									High
+									<input
+										type="radio"
+										name="priority"
+										value="high"
+										id="priority-high"
+										class="input-clickables"
+									/>
+								</label>
+							</fieldset>
+							<label class="form__item">
+								Group
+								<input type="text" name="group" id="input-group" />
+							</label>
+							<button type="submit" class="form__submit-btn">Confirm</button>
+						</form>
 					</div>
-					<form action="" id="form">
-						<div class="form__item">
-							<label for="input-title">Title</label>
-							<input type="text" name="title" id="input-title" required />
-						</div>
-						<div class="form__item">
-							<label for="input-desc">Short Description</label>
-							<textarea
-								name="desc"
-								id="input-desc"
-								cols="30"
-								rows="3"
-							></textarea>
-						</div>
-						<div class="form__item">
-							<label for="input-duedate">Duedate</label>
-							<input type="date" name="duedate" id="input-duedate" />
-						</div>
-						<div id="form__radio" class="form__item">
-							<div class="form__item__chip">
-								<label for="priority-normal">Normal</label>
-								<input
-									type="radio"
-									name="priority"
-									value="normal"
-									id="priority-normal"
-									checked
-								/>
-							</div>
-							<div class="form__item__chip">
-								<label for="priority-high">High</label>
-								<input
-									type="radio"
-									name="priority"
-									value="high"
-									id="priority-high"
-								/>
-							</div>
-						</div>
-						<div class="form__item">
-							<label for="input-project">Project</label>
-							<input type="text" name="project" id="input-project" />
-						</div>
-						<button type="submit" id="form__submit-btn">Confirm</button>
-					</form>
 				</dialog>
-				<dialog id="info-modal">
-					<div id="info-modal__container">
+				<dialog id="info-modal" class="info-modal">
+					<div class="modal__child-wrap">
 						<div class="modal-header">
 							<div class="info-modal__item">
 								<h2 id="title-info"></h2>
 							</div>
-							<button id="info-modal__close-btn" class="modal-close-btn">
-								Cancel
-							</button>
+							<button class="info-modal__close-btn modal-close-btn">Cancel</button>
 						</div>
-						<div id="info-modal__desc" class="info-modal__item">
-							<span class="info-modal__item-header">Description</span>
-							<span id="desc-info"></span>
-						</div>
-						<div class="info-modal__item">
-							<span class="info-modal__item-header">Duedate</span>
-							<span id="duedate-info"></span>
-						</div>
-						<div class="info-modal__item">
-							<span class="info-modal__item-header">Priority</span>
-							<span id="priority-info"></span>
-						</div>
-						<div class="info-modal__item">
-							<span class="info-modal__item-header">Project</span>
-							<span id="project-info"></span>
-						</div>
-						<div class="info-modal__item">
-							<span class="info-modal__item-header">Status</span>
-							<span id="completed-info"></span>
+						<div class="info-modal__items-wrap">
+							<section class="info-modal__desc info-modal__item">
+								<h3>Description</h3>
+								<p id="desc-info"></p>
+							</section>
+							<section class="info-modal__item">
+								<h3>Duedate</h3>
+								<span id="duedate-info"></span>
+							</section>
+							<section class="info-modal__item">
+								<h3>Priority</h3>
+								<span id="priority-info"></span>
+							</section>
+							<section class="info-modal__item">
+								<h3>Group</h3>
+								<span id="group-info"></span>
+							</section>
+							<section class="info-modal__item">
+								<h3>Status</h3>
+								<span id="completed-info"></span>
+							</section>
 						</div>
 					</div>
 				</dialog>
-				<button id="btn-cta">Add New Task</button>
-				<div id="tasks-container"></div>
+				<button class="btn-cta">Add New Task</button>
+				<article class="tasks-container"></article>
 			</main>
 			<footer>
-				<a href="https://github.com/yash-aryan/" target="_blank"
-					>Copyright ©
-					<script>
-						document.write(new Date().getFullYear());
-					</script>
-					yash-aryan
-				</a>
+				<a href="https://github.com/yash-aryan/" target="_blank" rel="noopener noreferrer"
+					>Made with &#128156; by yash-aryan</a
+				>
 			</footer>
 		</div>
 	</body>

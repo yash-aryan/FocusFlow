@@ -2,25 +2,25 @@
 
 FocusFlow is a simple **To-Do List web-app** project that I **created using vanilla Javascript** when doing The Odin Project Course.
 
-<h3><a href="https://yash-aryan.github.io/FocusFlow/" target="_blank">View Live Demo</a></h3>
+### [View Live Demo](https://yash-aryan.github.io/FocusFlow/)
 
--   This is the work-in-progress GUI version of the web-app.
+-   This is the GUI version of the FocusFlow web-app.
 -   **Utilized Webpack** for bundling together all the files used to create this project.
 -   **Utilized Date-fns** as dev-dependency to format date from ISO format to a better human-readable format.
 -   The output `index.html` & `bundle.js` are stored in the `dist/` directory.
 -   All of my files used to create `bundle.js` are stored in the `src/` directory.
 -   After every browser re-open/refresh, tasks objects are automatically added back to the todolist from the localStorage.
+-   I have tried giving more emphasis to decouple the code.
 
-# Additional Details
+## Additional Details
 
--   `index.js` dictates the flow of events, as it applies eventListeners to certain DOM elements.
--   Other JavaScript files are seperated to be a module that performs one specific task. For example:
-    -   `taskFactory.js` exports a factory function which inputs user selected 'task' data & outputs 'task' Objects.
-    -   `domHandler.js` exports functions that deals with DOM manipulation, actually creating/modifying/removing nodes in the DOM.
-    -   `todolistHandler.js` exports todolist function that deals with maintaing tasks for persistance & rapid modification.
-        -   Has exclusive access to `storageFactory` function, which deal with & abstracts away any external storage API or methods. Currently only uses browser's localStorage.
+-   `index.js` deals with event handeling, and dictates the flow of events.
+-   Modules contained inside `dom-handlers/` directory deals with DOM manipulation of their own specific elements.
+-   `todolistHandler.js` deals with persistance & modification of todolist and it's contained tasks. It also has exclusive access to:
+    -   `storageFactory` function, which deals with the storage implementation that has been applied. Current storage implementation is just the browser's localStorage.
+    -   `taskFactory` function to create task objects.
 
-# Project Status
+## Project Status
 
 -   [x] Create Basic GUI
 -   [x] Create Function to Add New Tasks
@@ -30,3 +30,4 @@ FocusFlow is a simple **To-Do List web-app** project that I **created using vani
 -   [x] Create Function to Edit Task
 -   [x] Create Function to Delete Task
 -   [x] Update UI's Visual Design
+-   [ ] Responsive UI

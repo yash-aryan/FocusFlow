@@ -1,185 +1,144 @@
 "use strict";
 import "./style.css";
-import todolist from "./todolistHandler";
-import dom from "./domHandler";
+import todolist from "./todolist-handler";
+import { navbar } from "./dom-handlers/navbar";
+import { formModal, getCtaBtn } from "./dom-handlers/form-modal";
+import { taskActions, taskController } from "./dom-handlers/task-controller";
+import { infoModal } from "./dom-handlers/info-modal";
 
 /* OVERVIEW:
-- This is the MAIN module that deals deals with event handling & deciding actions to take on each step.
-- This module doesn't modify DOM or Task Objects directly.
+- Main module. Deals with event handling.
+- Does not modify DOM or Task Objects directly.
 */
-window.todolist = todolist;
-// Restore tasks objects back to todolist after every reload/refresh.
-todolist.restoreTodolistFromStorage();
 
-todolist.getAllTasks().forEach((taskObj, index) => {
-	dom.taskContainer.createTask(index, taskObj.getInfo());
-	dom.projectContainer.addNewItem(taskObj.getInfo().project);
+// Restore tasks objects back to todolist after every webpage reload.
+todolist.restoreSaved();
+todolist.getAllTaskInfo().forEach(taskInfo => {
+	taskController.createTask(taskInfo);
+	navbar.addItem(taskInfo.group);
 });
 
-let currentTaskView = "";
-
 // ---PERMANENT EVENT LISTENERS---
+taskController.getContainer().addEventListener("click", taskEventHandler);
+formModal.getElement().addEventListener("click", formModal.handleDialogClick);
+formModal.getCloseBtn().addEventListener("click", formModal.close);
+infoModal.getElement().addEventListener("click", infoModal.handleDialogClick);
+infoModal.getCloseBtn().addEventListener("click", infoModal.close);
+navbar.getList().addEventListener("click", sidebarEventHandler);
+getCtaBtn().addEventListener("click", addTaskFlow);
 
-(function () {
-	const formModal__closeBtn = document.querySelector("#form-modal__close-btn");
-	formModal__closeBtn.addEventListener("click", dom.formModal.close);
-	const infoModal__closeBtn = document.querySelector("#info-modal__close-btn");
-	infoModal__closeBtn.addEventListener("click", dom.infoModal.close);
-	const tasksContainer = document.querySelector("#tasks-container");
-	tasksContainer.addEventListener("click", taskEventHandler);
-	const sideBar__itemsList = document.querySelector("#sidebar__items-list");
-	sideBar__itemsList.addEventListener("click", sidebarEventHandler);
-	const btnCta = document.querySelector("#btn-cta");
-	btnCta.addEventListener("click", addTaskFlow);
-})();
-
-// ---EVENT HANDLER functions---
-
+// ---EVENT HANDLERS---
 function taskEventHandler(e) {
-	const node = e.target;
-	if (!node.closest(".task")) return;
+	const targetNode = e.target;
+	const taskNode = taskController.getParentTaskElem(targetNode);
+	if (!taskNode) return;
 
-	const taskNode = node.closest("div.task");
-	const taskObj = todolist.getTask(taskNode.dataset.index);
+	const taskId = +taskNode.dataset.id;
 
-	if (node.closest(".task__check-btn")) {
-		taskObj.toggleStatus();
-		dom.taskContainer.toggleTaskState(taskNode);
-	} else if (node.closest(".task__info-btn")) {
-		dom.infoModal.display(taskObj.getInfo());
-	} else if (node.closest(".task__edit-btn")) editTaskFlow(taskNode, taskObj);
-	else if (node.closest(".task__delete-btn")) deleteTaskFlow(taskNode);
+	switch (e.target.dataset.action) {
+		case taskActions[0]:
+			todolist.toggleTaskStatus(taskId);
+			taskController.toggleTaskState(taskNode);
+			break;
+		case taskActions[1]:
+			infoModal.open(todolist.getTaskInfo(taskId));
+			break;
+		case taskActions[2]:
+			editTaskFlow(taskNode, todolist.getTaskInfo(taskId));
+			break;
+		case taskActions[3]:
+			deleteTaskFlow(taskNode);
+			break;
+		default:
+			return;
+	}
 }
 
 function sidebarEventHandler(e) {
-	const node = e.target;
-	const item = node.closest(".sidebar__item");
-	if (!node.closest(".sidebar__item") || isAlreadyOnSameTaskView()) return;
+	const itemNode = e.target;
+	if (!navbar.isItem(itemNode)) return;
+	if (navbar.isActive(itemNode)) return;
 
-	if (item.id === "sidebar__home-item") displayAllTasks();
-	else displayTasksByProject(item.dataset.taskView);
+	navbar.markActive(itemNode);
+	const targetGroup = itemNode.dataset.group;
 
-	currentTaskView = item.dataset.taskView;
-
-	function isAlreadyOnSameTaskView() {
-		if (item.dataset.taskView === currentTaskView) return true;
-		else return false;
-	}
+	if (navbar.isHomeItem(itemNode)) displayTasks();
+	else displayTasks(targetGroup);
 }
 
 // ---FLOW HANDLER functions---
-
 function addTaskFlow() {
-	const form = document.querySelector("#form");
-	const formModal = document.querySelector("#form-modal");
-	form.addEventListener("submit", addTask, { once: true });
-	formModal.addEventListener("close", stopFlow, { once: true });
-	dom.formModal.changeAction("Add Task");
-	dom.formModal.open();
+	formModal.getForm().addEventListener("submit", addTask, { once: true });
+	formModal.getElement().addEventListener("close", stopFlow, { once: true });
+	formModal.open("Add Task");
 
 	function addTask(e) {
 		e.preventDefault();
-		formModal.removeEventListener("close", stopFlow);
+		formModal.getElement().removeEventListener("close", stopFlow);
 
-		const formInputs = getFormInput();
-		const taskIndex = todolist.createTask(formInputs);
-		const taskObj = todolist.getTask(taskIndex);
-		dom.taskContainer.createTask(taskIndex, taskObj.getInfo());
-		dom.projectContainer.addNewItem(taskObj.getInfo().project);
-		dom.formModal.close();
+		const formData = formModal.getFormData();
+		const taskId = todolist.createTask(formData);
+		const taskInfo = todolist.getTaskInfo(taskId);
+		taskController.createTask(taskInfo);
+		navbar.addItem(taskInfo.group);
+		formModal.close();
 	}
 
 	function stopFlow() {
-		form.removeEventListener("submit", addTask);
-		dom.formModal.close();
+		formModal.getForm().removeEventListener("submit", addTask);
+		formModal.close();
 	}
 }
 
-function editTaskFlow(taskNode, taskObj) {
-	const form = document.querySelector("#form");
-	const formModal = document.querySelector("#form-modal");
-	form.addEventListener("submit", editTask, { once: true });
-	formModal.addEventListener("close", stopFlow, { once: true });
+function editTaskFlow(taskNode, taskInfo) {
+	const taskGroup = todolist.getTaskInfo(taskNode.dataset.id).group;
+	formModal.getForm().addEventListener("submit", editTask, { once: true });
+	formModal.getElement().addEventListener("close", stopFlow, { once: true });
 
-	const taskIndex = taskNode.dataset.index;
-	dom.formModal.changeAction("Edit Task");
-	dom.formModal.openPrefilled(taskObj.getInfo());
+	formModal.open("Edit Task", taskInfo);
 
 	function editTask(e) {
 		e.preventDefault();
-		const formInputs = getFormInput();
-		todolist.editTask(taskIndex, formInputs);
-		dom.taskContainer.editTask(taskIndex, formInputs);
-		dom.projectContainer.addNewItem(formInputs.project);
-		removeAllEmptyProjects();
-		dom.formModal.close();
+		const formData = formModal.getFormData();
+		todolist.editTask(taskInfo.id, formData);
+		taskController.editTask(taskNode, formData);
+
+		if (taskGroup !== formData.group) {
+			navbar.removeGroup(taskGroup);
+			navbar.addItem(formData.group);
+		}
+
+		formModal.close();
 	}
 
 	function stopFlow() {
-		form.removeEventListener("submit", editTask);
-		dom.formModal.close();
+		formModal.getForm().removeEventListener("submit", editTask);
+		formModal.close();
 	}
 }
 
 function deleteTaskFlow(taskNode) {
-	dom.taskContainer.removeTask(taskNode);
-	todolist.removeAt(taskNode.dataset.index);
+	const activeGroup = todolist.getTaskInfo(taskNode.dataset.id).group;
+	taskController.removeTask(taskNode);
+	todolist.removeTask(taskNode.dataset.id);
 
-	// Re-displaying the last view to sync all data-index value after deletion.
-	// If task container gets empty in current view, then load all tasks view.
-	if (document.querySelector("#tasks-container").innerHTML === "") {
-		currentTaskView = "";
-		displayAllTasks();
-	} else {
-		if (currentTaskView === "") displayAllTasks();
-		else displayTasksByProject(currentTaskView);
-	}
-	removeAllEmptyProjects();
+	// Re-renders todolist to sync all data-id value after deletion.
+	if (getTasksByGroup(activeGroup).length === 0) {
+		// Removes empty groups.
+		navbar.removeGroup(activeGroup);
+		displayTasks();
+	} else displayTasks(activeGroup);
 }
 
-// ---TASK DISPLAYING functions---
-
-function displayTasksByProject(projectName) {
-	dom.taskContainer.removeAllTasks();
-	todolist.getByProject(projectName).forEach(taskObj => {
-		// Assigning index from the main todolist.
-		const index = todolist.getAllTasks().indexOf(taskObj);
-		dom.taskContainer.createTask(index, taskObj.getInfo());
-	});
+function displayTasks(groupName) {
+	// Removes & re-renders all tasks. re-renders tasks by group (if provided).
+	taskController.removeAllTasks();
+	const allTaskInfo = groupName ? getTasksByGroup(groupName) : todolist.getAllTaskInfo();
+	allTaskInfo.forEach(taskInfo => taskController.createTask(taskInfo));
 }
 
-function displayAllTasks() {
-	dom.taskContainer.removeAllTasks();
-	todolist.getAllTasks().forEach((taskObj, index) => {
-		dom.taskContainer.createTask(index, taskObj.getInfo());
-	});
-}
-
-// ---HELPER functions---
-
-function getFormInput() {
-	const title = document.querySelector("#input-title").value;
-	const duedate = document.querySelector("#input-duedate").value;
-	const desc = document.querySelector("#input-desc").value;
-	const priority = document.querySelector(
-		'input[name="priority"]:checked'
-	).value;
-	const project = document.querySelector("#input-project").value;
-
-	return {
-		title,
-		duedate,
-		desc,
-		priority,
-		project,
-	};
-}
-
-function removeAllEmptyProjects() {
-	document.querySelectorAll(".project__item").forEach(node => {
-		const projectName = node.dataset.taskView;
-		if (todolist.getByProject(projectName).length === 0) {
-			dom.projectContainer.removeItem(projectName);
-		}
+function getTasksByGroup(groupName) {
+	return todolist.getAllTaskInfo().filter(taskInfo => {
+		return taskInfo.group === groupName;
 	});
 }
