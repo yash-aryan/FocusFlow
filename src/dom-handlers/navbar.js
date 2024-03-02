@@ -36,11 +36,14 @@ export const navbar = (() => {
 		activeNode = node;
 	}
 
-	function addItem(groupName) {
+	function addItem(groupName, shouldBeActive) {
 		if (!groupName) return;
 		if (doesItemExist()) return;
-		create();
-		if (!activeNode) markActive(getHomeItem());
+		const newItem = getNewItem();
+		getList().append(getItemWrapped(newItem));
+
+		if (shouldBeActive) markActive(newItem);
+		else if (!activeNode) markActive(getHomeItem());
 
 		function doesItemExist() {
 			const items = getAllItems();
@@ -48,19 +51,27 @@ export const navbar = (() => {
 			return items.some(node => groupName === node.dataset.group);
 		}
 
-		function create() {
-			const liWrap = document.createElement("li");
-			liWrap.classList.add("sidebar-list__item");
+		function getNewItem() {
+			// Returns the important sidebar button item containing data-attribute.
 			const sidebarItem = document.createElement("button");
 			sidebarItem.dataset.group = groupName;
 			sidebarItem.classList.add("sidebar-list__button", itemClass);
 			sidebarItem.textContent = groupName;
-			liWrap.append(sidebarItem);
-			getList().append(liWrap);
+			return sidebarItem;
+		}
+
+		function getItemWrapped(item) {
+			// Returns item with any additional wrap elements.
+			const liWrap = document.createElement("li");
+			liWrap.classList.add("sidebar-list__item");
+			liWrap.append(item);
+			return liWrap;
 		}
 	}
 
 	function removeGroup(groupName) {
+		if (!groupName) return;
+
 		const targetNode = getAllItems().find(item => item.dataset.group === groupName);
 
 		if (!isItem(targetNode)) return;

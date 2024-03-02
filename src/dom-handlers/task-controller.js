@@ -14,6 +14,7 @@ export const taskController = (() => {
 	}
 
 	function createTask(taskInfo) {
+		getContainer().classList.remove("tasks-container--empty");
 		getContainer().append(getTaskElem(taskInfo));
 	}
 
@@ -46,6 +47,7 @@ export const taskController = (() => {
 
 	function removeAllTasks() {
 		getContainer().replaceChildren();
+		getContainer().classList.add("tasks-container--empty");
 	}
 
 	// Private Methods

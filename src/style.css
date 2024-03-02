@@ -91,9 +91,9 @@ button:disabled {
 	padding: 0.5rem 1rem;
 	font-size: 1.5rem;
 	font-weight: 700;
+	border: 3px solid var(--secondary-color);
 	border-left: none;
 	transform: translateX(-3rem);
-	transition: transform 50ms;
 }
 .sidebar-list__button.active {
 	transform: translateX(0);
@@ -135,7 +135,7 @@ button:disabled {
 }
 
 .modal-close-btn {
-	padding: 0.5rem;
+	padding: 0.75rem;
 }
 
 /* form modal component */
@@ -163,6 +163,11 @@ button:disabled {
 	font-size: 1.25rem;
 	border: 1px solid;
 }
+#picker {
+	margin-right: 4px;
+	scale: 1.5;
+	cursor: pointer;
+}
 
 .form__radio-wrap {
 	flex-direction: row;
@@ -170,6 +175,9 @@ button:disabled {
 	margin: 0;
 	padding: 1rem;
 	border: 1px solid;
+}
+.form__radio-item {
+	cursor: pointer;
 }
 .input-clickables {
 	transform: scale(1.5);
@@ -181,7 +189,7 @@ button:disabled {
 }
 
 .form__submit-btn {
-	padding: 0.5rem 2rem;
+	padding: 1rem 2rem;
 	align-self: flex-end;
 }
 
@@ -222,6 +230,16 @@ button:disabled {
 	padding-top: 1rem;
 	border-top: 1px dashed;
 }
+.tasks-container--empty {
+	position: relative;
+}
+.tasks-container--empty::after {
+	position: absolute;
+	content: "- No Tasks Added -";
+	left: 50%;
+	transform: translateX(-50%);
+	font-size: 1.5rem;
+}
 
 /* task component */
 .task {
@@ -259,6 +277,10 @@ button:disabled {
 	transform: scale(2);
 	accent-color: var(--secondary-color);
 	cursor: pointer;
+	transition: transform;
+}
+.task__toggle:hover {
+	transform: scale(2.5);
 }
 .task__title {
 	font-size: 1.25rem;
@@ -269,9 +291,13 @@ button:disabled {
 footer {
 	position: absolute;
 	left: 50%;
-	bottom: 1rem;
+	bottom: 0;
 	transform: translateX(-50%);
+	padding: 1rem;
 	font-weight: 700;
+	border-top-left-radius: var(--wrapper-border-radius);
+	border-top-right-radius: var(--wrapper-border-radius);
+	background-color: var(--primary-color);
 }
 footer > * {
 	color: var(--secondary-color);

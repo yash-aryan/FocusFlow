@@ -79,8 +79,14 @@ function addTaskFlow() {
 		const formData = formModal.getFormData();
 		const taskId = todolist.createTask(formData);
 		const taskInfo = todolist.getTaskInfo(taskId);
+
+		if (getTasksByGroup(formData.group).length === 1) {
+			// when adding task of totally new group.
+			taskController.removeAllTasks();
+			navbar.addItem(taskInfo.group, true);
+		}
+
 		taskController.createTask(taskInfo);
-		navbar.addItem(taskInfo.group);
 		formModal.close();
 	}
 
@@ -104,8 +110,9 @@ function editTaskFlow(taskNode, taskInfo) {
 		taskController.editTask(taskNode, formData);
 
 		if (taskGroup !== formData.group) {
+			// when group has been edited.
 			navbar.removeGroup(taskGroup);
-			navbar.addItem(formData.group);
+			navbar.addItem(formData.group, true);
 		}
 
 		formModal.close();
