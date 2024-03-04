@@ -1,5 +1,5 @@
 "use strict";
-import "./style.css";
+import "./styles/index.css";
 import todolist from "./todolist-handler";
 import { navbar } from "./dom-handlers/navbar";
 import { formModal, getCtaBtn } from "./dom-handlers/form-modal";

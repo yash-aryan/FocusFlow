@@ -1,4 +1,5 @@
 "use strict";
+import "../styles/modals.css";
 
 export function getCtaBtn() {
 	return document.querySelector(".btn-cta");

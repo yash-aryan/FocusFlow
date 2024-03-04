@@ -1,0 +1,36 @@
+/* sidebar */
+.sidebar {
+	grid-area: 2 / 1 / -1 / 2;
+	overflow: hidden;
+}
+.sidebar-list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	display: flex;
+	flex-direction: column;
+	gap: 2rem;
+	overflow: auto;
+}
+
+/* sidebar item component */
+.sidebar-list__item,
+.sidebar-list__button {
+	border-radius: 0;
+	border-top-right-radius: var(--item-border-radius);
+	border-bottom-right-radius: var(--item-border-radius);
+}
+.sidebar-list__button {
+	width: 100%;
+	display: flex;
+	justify-content: flex-end;
+	padding: 0.5rem 1rem;
+	font-size: 1.5rem;
+	font-weight: 700;
+	border: 3px solid var(--secondary-color);
+	border-left: none;
+	transform: translateX(-3rem);
+}
+.sidebar-list__button.active {
+	transform: translateX(0);
+}

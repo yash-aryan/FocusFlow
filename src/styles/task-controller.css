@@ -1,0 +1,63 @@
+.tasks-container {
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+	padding-top: 1rem;
+	overflow: auto;
+}
+.tasks-container--empty {
+	position: relative;
+}
+.tasks-container--empty::after {
+	position: absolute;
+	content: "- No Tasks Added -";
+	left: 50%;
+	transform: translateX(-50%);
+	font-size: 1.5rem;
+}
+
+/* task component */
+.task {
+	position: relative;
+	display: flex;
+	justify-content: space-between;
+	padding: 0.5rem 1rem;
+	padding-left: calc(1rem + var(--task-priority-width));
+}
+.task::before,
+.task--normal::before {
+	position: absolute;
+	left: 0;
+	top: 0;
+	content: "";
+	width: var(--task-priority-width);
+	height: 100%;
+	background-color: var(--secondary-color);
+	border-top-left-radius: var(--wrapper-border-radius);
+	border-bottom-left-radius: var(--wrapper-border-radius);
+}
+.task--high::before {
+	background-color: #e53935;
+}
+.task--completed::before {
+	background-color: transparent;
+}
+.task__child-wrap {
+	display: flex;
+	align-items: center;
+	gap: 1.25rem;
+}
+.task__toggle {
+	margin: 0;
+	transform: scale(2);
+	accent-color: var(--secondary-color);
+	cursor: pointer;
+	transition: transform;
+}
+.task__toggle:hover {
+	transform: scale(2.5);
+}
+.task__title {
+	font-size: 1.25rem;
+	font-weight: 700;
+}

@@ -1,4 +1,5 @@
 "use strict";
+import "../styles/modals.css";
 
 import { formatDate } from "../utils/format-date";
 

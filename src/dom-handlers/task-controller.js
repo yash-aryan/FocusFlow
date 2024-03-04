@@ -1,4 +1,5 @@
 "use strict";
+import "../styles/task-controller.css";
 
 import { formatDate } from "../utils/format-date";
 

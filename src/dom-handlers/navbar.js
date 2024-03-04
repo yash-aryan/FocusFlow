@@ -1,4 +1,5 @@
 "use strict";
+import "../styles/navbar.css";
 
 export const navbar = (() => {
 	const homeItemId = "home-item",

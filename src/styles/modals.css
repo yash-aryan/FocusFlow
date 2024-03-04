@@ -1,0 +1,113 @@
+/* form & info modal shared */
+.form-modal,
+.info-modal {
+	padding: 0rem;
+	border-radius: var(--wrapper-border-radius);
+}
+.form-modal::backdrop,
+.info-modal::backdrop {
+	backdrop-filter: blur(2px);
+	background-color: rgb(64, 64, 80, 50%);
+}
+.modal__child-wrap {
+	display: flex;
+	flex-direction: column;
+	gap: 2rem;
+	padding: 2rem;
+	border-radius: var(--wrapper-border-radius);
+}
+
+.modal-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.modal-close-btn {
+	padding: 0.75rem;
+}
+
+/* form modal component */
+.form-modal__form {
+	display: flex;
+	flex-direction: column;
+	gap: 2rem;
+}
+
+.form__item {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	font-size: 1.25rem;
+}
+.form__item--row {
+	display: flex;
+	gap: 0.5rem;
+	font-size: 1.25rem;
+}
+
+.form__item > input,
+.form__item > textarea {
+	padding: 0.5rem;
+	font-size: 1.25rem;
+	border: 1px solid;
+}
+#picker {
+	margin-right: 4px;
+	scale: 1.5;
+	cursor: pointer;
+}
+
+.form__radio-wrap {
+	flex-direction: row;
+	justify-content: space-evenly;
+	margin: 0;
+	padding: 1rem;
+	border: 1px solid;
+}
+.form__radio-item {
+	cursor: pointer;
+}
+.input-clickables {
+	transform: scale(1.5);
+}
+
+#input-desc {
+	padding: 0.5rem;
+	resize: none;
+}
+
+.form__submit-btn {
+	padding: 1rem 2rem;
+	align-self: flex-end;
+}
+
+/* info modal component */
+.info-modal__items-wrap {
+	display: flex;
+	flex-direction: column;
+	gap: 3rem;
+}
+
+.info-modal__item {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	font-size: 1.25rem;
+}
+
+.info-modal__desc {
+	width: 25rem;
+	max-height: 10rem;
+	overflow: auto;
+}
+
+/* cta button component */
+.btn-cta {
+	align-self: flex-start;
+	padding: 1rem;
+	font-weight: 700;
+	color: var(--primary-color);
+	background-color: var(--secondary-color);
+	border: 0;
+}
