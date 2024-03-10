@@ -53,13 +53,11 @@ export const taskController = (() => {
 
 	// Private Methods
 	function getTaskElem(taskInfo) {
-		// Returns virtual DOM Task Element after this long ass tedious procedure...
-		const task = document.createElement("div");
-		task.className = getTaskClasses();
-		task.dataset.id = taskInfo.id; // task id
+		// Returns virtual DOM Task Element.
+		const taskElem = document.createElement("section");
+		taskElem.className = getTaskClasses();
+		taskElem.dataset.id = taskInfo.id;
 
-		const wrapper = document.createElement("div");
-		wrapper.classList.add("task__child-wrap");
 		const taskCheckBox = document.createElement("input");
 		taskCheckBox.dataset.action = taskActions[0];
 		taskCheckBox.setAttribute("name", "checked");
@@ -67,15 +65,19 @@ export const taskController = (() => {
 		taskCheckBox.setAttribute("aria-label", "Toggle task");
 		taskCheckBox.checked = taskInfo.completed;
 		taskCheckBox.classList.add("task__toggle");
-		const taskTitleText = document.createElement("span");
+
+		// all content on the right
+		const wrapperCol = document.createElement("div");
+		wrapperCol.classList.add("task__wrap", "task__wrap--col");
+		const taskTitleText = document.createElement("h2");
 		taskTitleText.classList.add("task__title");
-		taskTitleText.textContent = taskInfo.title; // task title
+		taskTitleText.textContent = taskInfo.title;
+
+		const wrapperRow = document.createElement("div");
+		wrapperRow.classList.add("task__wrap", "task__wrap--row");
 		const taskDuedateText = document.createElement("span");
 		taskDuedateText.classList.add("task__duedate");
-		taskDuedateText.textContent = formatDate(taskInfo.duedate); // task duedate (after formatting)
-
-		const wrapper2 = document.createElement("div");
-		wrapper2.classList.add("task__child-wrap");
+		taskDuedateText.textContent = formatDate(taskInfo.duedate);
 		const taskInfoBtn = document.createElement("button");
 		taskInfoBtn.dataset.action = taskActions[1];
 		taskInfoBtn.classList.add("task__info-btn", "task__chip-btn");
@@ -89,11 +91,11 @@ export const taskController = (() => {
 		taskDeleteBtn.classList.add("task__delete-btn", "task__chip-btn");
 		taskDeleteBtn.textContent = "delete";
 
-		wrapper.append(taskCheckBox, taskTitleText, taskDuedateText);
-		wrapper2.append(taskInfoBtn, taskEditBtn, taskDeleteBtn);
-		task.append(wrapper, wrapper2);
+		wrapperRow.append(taskDuedateText, taskInfoBtn, taskEditBtn, taskDeleteBtn);
+		wrapperCol.append(taskTitleText, wrapperRow);
+		taskElem.append(taskCheckBox, wrapperCol);
 
-		return task;
+		return taskElem;
 
 		function getTaskClasses() {
 			const allClasses = [];

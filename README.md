@@ -1,10 +1,12 @@
-# Overview
+# FocusFlow
 
-FocusFlow is a simple **To-Do List web-app** project that I **created using vanilla Javascript** when doing The Odin Project Course.
+## Overview
+
+FocusFlow is a simple **To-Do List web-app** project that I **created using vanilla Javascript**. This is one of the many projects I've created by myself when doing "The Odin Project" course. I have also updated this project overtime with commits related to code refactors & UI changes; FocusFlow now has a fully responsive design.
 
 ### [View Live Demo](https://yash-aryan.github.io/FocusFlow/)
 
--   This is the GUI version of the FocusFlow web-app.
+-   This is the Responsive GUI version of the FocusFlow web-app.
 -   **Utilized Webpack** for bundling together all the files used to create this project.
 -   **Utilized Date-fns** as dev-dependency to format date from ISO format to a better human-readable format.
 -   The output `index.html` & `bundle.js` are stored in the `dist/` directory.
@@ -30,4 +32,4 @@ FocusFlow is a simple **To-Do List web-app** project that I **created using vani
 -   [x] Create Function to Edit Task
 -   [x] Create Function to Delete Task
 -   [x] Update UI's Visual Design
--   [ ] Responsive UI
+-   [x] Responsive UI
