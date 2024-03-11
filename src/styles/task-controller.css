@@ -75,6 +75,10 @@
 		padding-inline: 10%;
 	}
 
+	.tasks-container--empty {
+		height: 5rem;
+	}
+
 	.task__wrap--row {
 		align-items: center;
 	}
